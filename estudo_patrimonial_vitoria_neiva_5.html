@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudo Patrimonial — Troca de Veículo | Vitória & Neiva</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg-deep:#0A0C1A;
+  --bg-card:#0F1225;
+  --bg-elevated:#141728;
+  --navy:#1E2761;
+  --gold:#C9A84C;
+  --gold-light:#E8C97A;
+  --text-primary:#F0EDE6;
+  --text-muted:#8B8FA8;
+  --success:#4CAF8C;
+  --warning:#E8A83C;
+  --danger:#E85C4A;
+  --border:rgba(201,168,76,0.15);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:var(--bg-deep);
+  color:var(--text-primary);
+  font-family:'DM Sans',-apple-system,sans-serif;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.serif{font-family:'Playfair Display',Georgia,serif;}
+.mono{font-family:'DM Mono','Courier New',monospace;}
+
+/* PASSWORD OVERLAY */
+#password-overlay{
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background:var(--bg-deep); z-index:9999;
+  display:flex; align-items:center; justify-content:center;
+}
+.pwd-box{text-align:center; padding:2rem;}
+.pwd-brand{font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--gold); margin-bottom:0.5rem;}
+.pwd-sub{font-size:0.9rem; color:var(--text-muted); margin-bottom:2rem; letter-spacing:0.02em;}
+#pwd-input{
+  background:var(--bg-elevated); border:1px solid rgba(201,168,76,0.3); color:var(--text-primary);
+  padding:0.85rem 1.25rem; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:1rem;
+  width:280px; outline:none; text-align:center; letter-spacing:0.05em;
+}
+#pwd-input:focus{border-color:var(--gold);}
+.pwd-btn{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--bg-deep); border:none;
+  padding:0.85rem 2.2rem; border-radius:10px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:0.95rem;
+  cursor:pointer; margin-top:1.2rem; letter-spacing:0.02em; transition:transform .15s ease;
+}
+.pwd-btn:hover{transform:translateY(-1px);}
+#pwd-error{color:var(--danger); font-size:0.85rem; margin-top:1rem; display:none;}
+
+#main-content{display:none;}
+
+.shell{max-width:1180px; margin:0 auto; padding:0 28px 100px;}
+
+/* HERO */
+.hero{
+  min-height:78vh; display:flex; flex-direction:column; justify-content:center;
+  padding:5rem 28px 4rem; position:relative; overflow:hidden;
+  background:
+    radial-gradient(ellipse at 18% 0%, rgba(30,39,97,0.55) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 90%, rgba(201,168,76,0.08) 0%, transparent 60%);
+  max-width:1180px; margin:0 auto;
+}
+.hero-eyebrow{
+  font-size:0.75rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold);
+  margin-bottom:1.4rem; font-weight:600;
+}
+.hero h1{
+  font-size:clamp(2.4rem,5.2vw,4.3rem); font-weight:500; line-height:1.06; letter-spacing:-0.02em;
+  max-width:880px; margin-bottom:1.6rem;
+}
+.hero h1 em{font-style:italic; color:var(--gold-light);}
+.hero-statement{
+  font-size:1.12rem; color:var(--text-muted); max-width:680px; line-height:1.75; margin-bottom:2.6rem;
+}
+.hero-meta{font-size:0.85rem; color:var(--text-muted); letter-spacing:0.03em;}
+.hero-meta strong{color:var(--text-primary);}
+
+.hero-grid{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:2.8rem;
+}
+.hero-metric{
+  border:1px solid var(--border); background:rgba(255,255,255,0.025); border-radius:16px; padding:18px;
+}
+.hero-metric small{
+  display:block; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted);
+  font-weight:600; margin-bottom:8px;
+}
+.hero-metric strong{font-size:1.4rem; font-family:'DM Mono',monospace; color:var(--gold-light); letter-spacing:-0.02em;}
+
+/* SECTIONS */
+.section{padding:4.2rem 0; border-top:1px solid rgba(255,255,255,0.06);}
+.section-label{
+  font-size:0.72rem; text-transform:uppercase; letter-spacing:0.18em; color:var(--gold); font-weight:700;
+  margin-bottom:0.8rem;
+}
+.section-title{
+  font-family:'Playfair Display',serif; font-size:clamp(1.7rem,3vw,2.3rem); font-weight:500;
+  margin-bottom:0.9rem; letter-spacing:-0.01em;
+}
+.section-note{color:var(--text-muted); max-width:640px; font-size:0.98rem; margin-bottom:2.4rem; line-height:1.7;}
+
+.grid{display:grid; gap:18px;}
+.grid-2{grid-template-columns:repeat(2,1fr);}
+.grid-3{grid-template-columns:repeat(3,1fr);}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+
+.card{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:26px;
+}
+.card-elevated{background:var(--bg-elevated);}
+
+.tag{
+  display:inline-flex; align-items:center; padding:6px 13px; border-radius:999px; font-size:0.72rem;
+  font-weight:700; letter-spacing:0.03em; text-transform:uppercase;
+}
+.tag-gold{background:rgba(201,168,76,0.14); color:var(--gold-light);}
+.tag-green{background:rgba(76,175,140,0.14); color:var(--success);}
+.tag-red{background:rgba(232,92,74,0.14); color:var(--danger);}
+.tag-blue{background:rgba(99,130,210,0.14); color:#8fa8e8;}
+
+.metric-label{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); font-weight:700; margin-bottom:8px;}
+.metric-value{font-family:'DM Mono',monospace; font-size:1.9rem; font-weight:500; color:var(--text-primary); letter-spacing:-0.02em;}
+.metric-sub{color:var(--text-muted); font-size:0.85rem; margin-top:8px; line-height:1.5;}
+
+table{width:100%; border-collapse:separate; border-spacing:0; border-radius:16px; overflow:hidden; border:1px solid var(--border);}
+th,td{text-align:left; padding:14px 16px; font-size:0.88rem; border-bottom:1px solid rgba(255,255,255,0.05);}
+th{background:var(--navy); color:var(--text-primary); text-transform:uppercase; font-size:0.68rem; letter-spacing:0.07em; font-weight:700;}
+td{color:var(--text-muted);}
+td strong{color:var(--text-primary); font-family:'DM Mono',monospace; font-weight:500;}
+tr:last-child td{border-bottom:0;}
+tbody tr:hover{background:rgba(255,255,255,0.015);}
+
+.callout{
+  border-radius:18px; padding:22px 24px; border:1px solid var(--border); background:rgba(201,168,76,0.05);
+  font-size:0.95rem; color:var(--text-primary); line-height:1.7;
+}
+.callout strong{color:var(--gold-light);}
+
+.callout-danger{background:rgba(232,92,74,0.06); border-color:rgba(232,92,74,0.2);}
+.callout-danger strong{color:var(--danger);}
+
+.checklist{list-style:none; margin-top:14px;}
+.checklist li{position:relative; padding-left:26px; margin-bottom:10px; color:var(--text-muted); font-size:0.9rem; line-height:1.55;}
+.checklist li:before{
+  content:"✓"; position:absolute; left:0; top:1px; width:17px; height:17px; border-radius:999px;
+  display:grid; place-items:center; background:rgba(76,175,140,0.16); color:var(--success); font-size:10px; font-weight:900;
+}
+.checklist.warn li:before{content:"!"; background:rgba(232,92,74,0.16); color:var(--danger);}
+
+.chart-wrap{background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:28px; position:relative; height:340px;}
+.chart-wrap canvas{max-height:100%;}
+
+.quote{
+  font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:500; line-height:1.4; letter-spacing:-0.01em; color:var(--gold-light);
+}
+
+.divider{height:1px; background:rgba(255,255,255,0.07); margin:18px 0;}
+
+footer{
+  padding:3rem 0 1rem; border-top:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between;
+  align-items:center; flex-wrap:wrap; gap:16px; color:var(--text-muted); font-size:0.82rem;
+}
+.sig-name{color:var(--text-primary); font-family:'Playfair Display',serif; font-size:1.15rem; margin-bottom:3px;}
+
+@media(max-width:860px){
+  .grid-2,.grid-3,.grid-4,.hero-grid{grid-template-columns:1fr;}
+  table{display:block; overflow-x:auto; white-space:nowrap;}
+  .shell{padding:0 18px 70px;}
+}
+</style>
+</head>
+<body>
+
+<div id="password-overlay">
+  <div class="pwd-box">
+    <div class="pwd-brand">Planejamento Financeiro</div>
+    <div class="pwd-sub">Vitória &amp; Neiva · Junho 2026</div>
+    <input id="pwd-input" type="password" placeholder="Senha de acesso">
+    <br>
+    <button class="pwd-btn" onclick="checkPassword()">Acessar</button>
+    <div id="pwd-error">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<div id="main-content">
+
+<section class="hero">
+  <div class="hero-eyebrow">Vitória &amp; Neiva · Estudo Patrimonial</div>
+  <h1>Troca de veículo: <em>os caminhos</em> para decidir com clareza</h1>
+  <p class="hero-statement">
+    Vitória, você trouxe três propostas reais — CDC, consignado e consórcio. Esse estudo
+    organiza os números de cada uma e mostra onde cada caminho aperta o seu orçamento,
+    para que a decisão seja sua, com todos os dados na mesa.
+  </p>
+  <div class="hero-meta">Elaborado por <strong>Matheus Melo</strong> · Planejamento Financeiro Pessoal · Grão | Grupo Primo</div>
+
+  <div class="hero-grid">
+    <div class="hero-metric"><small>Você consegue poupar</small><strong>R$ 3.000/mês</strong></div>
+    <div class="hero-metric"><small>Parcela confortável</small><strong>até R$ 1.500</strong></div>
+    <div class="hero-metric"><small>Entrada estimada</small><strong>~R$ 58.000</strong></div>
+    <div class="hero-metric"><small>Data de referência</small><strong>Jan/2027</strong></div>
+  </div>
+</section>
+
+<div class="shell">
+
+<section class="section" style="border-top:0;">
+  <div class="section-label">01 · O que esta análise responde</div>
+  <h2 class="section-title">A pergunta certa não é "qual parcela cabe"</h2>
+  <p class="section-note">É: qual caminho te entrega o carro na data que você precisa, sem desorganizar o resto do seu plano.</p>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <span class="tag tag-gold">Pergunta central</span>
+      <p class="quote" style="margin-top:16px;">"O que pesa mais agora: garantir a troca em janeiro, ou pagar o menor custo possível pelo crédito?"</p>
+    </div>
+    <div class="card">
+      <h3 style="font-family:'Playfair Display',serif; font-weight:500; font-size:1.2rem; margin-bottom:10px;">Sua posição de força</h3>
+      <p style="color:var(--text-muted); font-size:0.93rem;">
+        Você tem renda estável, reserva organizada e poupa cerca de R$3.000 por mês.
+        Isso te dá algo raro nessa decisão: tempo. Você não precisa aceitar a primeira
+        proposta aprovada — pode escolher com base no que realmente serve ao seu plano.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">02 · As três propostas reais</div>
+  <h2 class="section-title">O que você já tem cotado, lado a lado</h2>
+  <p class="section-note">Cada uma veio de uma fonte oficial — Safra, Banco do Brasil (consignado) e BB Consórcios.</p>
+
+  <div class="grid grid-3">
+    <div class="card">
+      <span class="tag tag-red">CDC Safra</span>
+      <div style="margin-top:16px;">
+        <div class="metric-label">Parcela aprovada</div>
+        <div class="metric-value">R$ 1.443,49</div>
+        <div class="metric-sub">R$ 48.000 financiados · 60x · proposta nº 357151368</div>
+      </div>
+      <div class="divider"></div>
+      <div class="metric-label">Custo total de juros</div>
+      <div class="metric-value" style="font-size:1.4rem; color:var(--danger);">R$ 38.609,40</div>
+      <div class="metric-sub">80,4% sobre o valor financiado</div>
+    </div>
+
+    <div class="card" style="border-color:rgba(76,175,140,0.3);">
+      <span class="tag tag-green">Consignado BB</span>
+      <div style="margin-top:16px;">
+        <div class="metric-label">Parcela (melhor encaixe)</div>
+        <div class="metric-value">R$ 1.425,05</div>
+        <div class="metric-sub">R$ 45.000 solicitados · 48x · margem disponível R$ 162.164,02/mês</div>
+      </div>
+      <div class="divider"></div>
+      <div class="metric-label">Custo total de juros</div>
+      <div class="metric-value" style="font-size:1.4rem; color:var(--success);">R$ 23.402,40</div>
+      <div class="metric-sub">52,0% sobre o valor solicitado</div>
+    </div>
+
+    <div class="card">
+      <span class="tag tag-blue">Consórcio BB</span>
+      <div style="margin-top:16px;">
+        <div class="metric-label">Parcela</div>
+        <div class="metric-value">R$ 1.313,53</div>
+        <div class="metric-sub">Cronos Drive 1.0 · R$ 108.704 · 97x</div>
+      </div>
+      <div class="divider"></div>
+      <div class="metric-label">Custo (taxa adm. + fundo)</div>
+      <div class="metric-value" style="font-size:1.4rem; color:#8fa8e8;">R$ 18.707,96</div>
+      <div class="metric-sub">17,2% sobre o valor do bem · sem data garantida de contemplação</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">03 · Comparação visual</div>
+  <h2 class="section-title">Parcela menor não é sinônimo de custo menor</h2>
+  <p class="section-note">Os dois gráficos abaixo mostram exatamente esse contraste: quem tem a parcela mais baixa nem sempre é quem custa menos no total.</p>
+
+  <div class="grid grid-2">
+    <div>
+      <div class="metric-label" style="margin-bottom:12px;">Parcela mensal (R$)</div>
+      <div class="chart-wrap"><canvas id="chartParcelas"></canvas></div>
+    </div>
+    <div>
+      <div class="metric-label" style="margin-bottom:12px;">Custo total — juros / taxas (R$)</div>
+      <div class="chart-wrap"><canvas id="chartCustoTotal"></canvas></div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <strong>Leitura:</strong> o consórcio tem a parcela mais baixa das três — mas isso porque o prazo é quase o dobro (97x),
+    e o custo de R$18.708 só se confirma <em>se</em> a contemplação realmente acontecer; até lá, é parcela paga sem carro
+    e sem rendimento sobre o capital. Entre as opções com crédito garantido, o consignado, com parcela praticamente igual
+    à do CDC Safra, custa <strong>R$ 15.207 a menos em juros totais</strong> só pela diferença de taxa efetiva entre as duas modalidades.
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">04 · Todas as simulações coletadas</div>
+  <h2 class="section-title">Mapa completo das propostas</h2>
+  <p class="section-note">Inclui as variações de prazo e valor que você também simulou, para referência.</p>
+
+  <div class="card" style="padding:0; overflow:hidden;">
+    <table>
+      <thead>
+        <tr><th>Modalidade</th><th>Crédito</th><th>Prazo</th><th>Parcela</th><th>Leitura</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>CDC Safra</strong></td><td>R$ 48.000</td><td>60x</td><td><strong>R$ 1.443,49</strong></td><td>Aprovado, crédito imediato — mas o mais caro das três.</td></tr>
+        <tr><td><strong>Consignado BB</strong></td><td>R$ 45.000</td><td>48x</td><td><strong>R$ 1.425,05</strong></td><td>Melhor encaixe se janeiro/2027 for prazo fixo.</td></tr>
+        <tr><td><strong>Consignado BB</strong></td><td>R$ 45.000</td><td>96x</td><td><strong>R$ 984,52</strong></td><td>Parcela baixa, mas dobra o tempo de comprometimento da margem.</td></tr>
+        <tr><td><strong>Consignado BB</strong></td><td>R$ 70.000</td><td>120x</td><td><strong>R$ 1.402,19</strong></td><td>Parcela parecida ao plano atual, mas prazo muito mais longo.</td></tr>
+        <tr><td><strong>Consignado BB</strong></td><td>R$ 100.000</td><td>120x</td><td><strong>R$ 2.003,13</strong></td><td>Passa do limite de conforto definido (R$1.500).</td></tr>
+        <tr><td><strong>Consignado BB</strong></td><td>R$ 108.000</td><td>97x</td><td><strong>R$ 2.336,02</strong></td><td>Fica pesado demais para o orçamento.</td></tr>
+        <tr><td><strong>Consórcio BB — Cronos Drive 1.0</strong></td><td>R$ 108.704</td><td>97x</td><td><strong>R$ 1.313,53</strong></td><td>Parcela atrativa, mas sem data garantida de entrega.</td></tr>
+        <tr><td><strong>Consórcio BB — Yaris XL 1.5 FL</strong></td><td>R$ 109.339</td><td>97x</td><td><strong>R$ 1.321,20</strong></td><td>Estrutura semelhante ao Cronos.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">05 · Sua entrada até janeiro/2027</div>
+  <h2 class="section-title">De onde vem o valor de entrada, mês a mês</h2>
+  <p class="section-note">Reconstrução do cronograma a partir do que você trouxe: aporte de R$3.000/mês, 13º parcial e 1/3 de férias. Os valores de 13º e férias são estimativas — ajustamos assim que você confirmar os números exatos.</p>
+
+  <div class="grid grid-2">
+    <div class="chart-wrap" style="height:300px;">
+      <canvas id="chartAcumulo"></canvas>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Mês</th><th>Entrada no mês</th><th>Acumulado</th></tr></thead>
+        <tbody>
+          <tr><td>Jun/26</td><td>R$ 3.000</td><td><strong>R$ 3.000</strong></td></tr>
+          <tr><td>Jul/26</td><td>R$ 3.000</td><td><strong>R$ 6.000</strong></td></tr>
+          <tr><td>Ago/26</td><td>R$ 3.000</td><td><strong>R$ 9.000</strong></td></tr>
+          <tr><td>Set/26</td><td>R$ 3.000</td><td><strong>R$ 12.000</strong></td></tr>
+          <tr><td>Out/26</td><td>R$ 3.000</td><td><strong>R$ 15.000</strong></td></tr>
+          <tr><td>Nov/26 <span style="color:var(--text-muted); font-size:0.75rem;">(+13º parcial, est.)</span></td><td>R$ 7.500</td><td><strong>R$ 22.500</strong></td></tr>
+          <tr><td>Dez/26 <span style="color:var(--text-muted); font-size:0.75rem;">(+1/3 férias, est.)</span></td><td>R$ 10.500</td><td><strong>R$ 33.000</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <div class="grid grid-3">
+      <div>
+        <div class="metric-label">Acumulado em dinheiro até dez/26</div>
+        <div class="metric-value" style="font-size:1.5rem;">R$ 33.000</div>
+      </div>
+      <div>
+        <div class="metric-label">+ Carro avaliado (Dudu)</div>
+        <div class="metric-value" style="font-size:1.5rem;">R$ 25.000</div>
+      </div>
+      <div>
+        <div class="metric-label">= Entrada total disponível</div>
+        <div class="metric-value" style="font-size:1.5rem; color:var(--gold-light);">R$ 58.000</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:18px;">
+    Esse número (~R$58 mil) é diferente do valor de R$52 mil usado na proposta do Safra — porque ali a entrada
+    foi calculada de trás para frente (R$100 mil do carro menos R$48 mil financiados). Com o cronograma acima,
+    sua entrada real tende a ficar um pouco maior, o que reduz ainda mais o crédito necessário em qualquer das modalidades.
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">06 · Teste de estresse</div>
+  <h2 class="section-title">A parcela ainda cabe se sua renda cair?</h2>
+  <p class="section-note">Cenário conservador a partir de meados de 2027, sem bolsa de projeto adicional — renda líquida estimada de R$ 9.374,64.</p>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <span class="tag tag-blue">Cenário conservador</span>
+      <div class="metric-label" style="margin-top:16px;">Renda líquida estimada</div>
+      <div class="metric-value">R$ 9.374,64</div>
+      <div class="metric-sub">Remuneração base, 40h, Doutorado/RSC-VI, sem bolsa de projeto.</div>
+      <div class="divider"></div>
+      <p style="color:var(--text-muted); font-size:0.9rem;">
+        A pergunta certa não é se a parcela cabe na sua renda <em>de hoje</em> — é se ela
+        continua confortável mesmo num cenário de renda menor.
+      </p>
+    </div>
+    <div class="chart-wrap" style="height:auto; padding:26px;">
+      <div class="metric-label" style="margin-bottom:14px;">Comprometimento da renda futura (%)</div>
+      <canvas id="chartEstresse" style="max-height:260px;"></canvas>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:20px;">
+    <strong>O que os números mostram:</strong> nas faixas de R$1.300 a R$1.450, a parcela representa entre
+    14% e 15% da renda no cenário conservador. Nas faixas de R$2.000 a R$2.336, esse percentual sobe para
+    21% a 25% da renda futura.
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">07 · Aprofundando o consórcio</div>
+  <h2 class="section-title">E se você desse um lance para contemplar mais rápido?</h2>
+  <p class="section-note">Modelado sobre o Cronos Drive 1.0 (R$108.704), simulando lances de 10%, 20% e 30% do valor do bem.</p>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3 style="font-family:'Playfair Display',serif; font-weight:500; font-size:1.1rem; margin-bottom:14px;">Efeito do lance no saldo devedor</h3>
+      <table>
+        <thead><tr><th>Lance</th><th>Valor</th><th>Parcelas restantes</th><th>Tempo até quitar</th></tr></thead>
+        <tbody>
+          <tr><td>10% do bem</td><td><strong>R$ 10.870</strong></td><td>~89x</td><td>~7,4 anos</td></tr>
+          <tr><td>20% do bem</td><td><strong>R$ 21.741</strong></td><td>~80x</td><td>~6,7 anos</td></tr>
+          <tr><td>30% do bem</td><td><strong>R$ 32.611</strong></td><td>~72x</td><td>~6,0 anos</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--text-muted); font-size:0.84rem; margin-top:12px;">Mantendo a parcela em ~R$1.313,53/mês.</p>
+    </div>
+
+    <div class="card" style="border-color:rgba(232,92,74,0.25);">
+      <span class="tag tag-red">Ponto de atenção</span>
+      <h3 style="font-family:'Playfair Display',serif; font-weight:500; font-size:1.1rem; margin:14px 0 10px;">O lance não compra data</h3>
+      <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.7;">
+        O lance resolve o <strong style="color:var(--text-primary);">saldo devedor</strong> depois que você é contemplada —
+        mas não garante <strong style="color:var(--text-primary);">quando</strong> isso acontece.
+        A contemplação por lance depende de vencer a disputa contra outros participantes do mesmo
+        grupo (1790), assembleia por assembleia. Mesmo um lance de 30% pode não ser suficiente
+        em um mês específico.
+      </p>
+      <div class="callout callout-danger" style="margin-top:16px;">
+        Mesmo dando um lance de R$32.611, não há garantia de que o crédito saia a tempo de janeiro/2027.
+        Esse valor pode ficar imobilizado por meses sem previsão de retorno.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">08 · Comparativo final</div>
+  <h2 class="section-title">As cinco vias, lado a lado</h2>
+  <p class="section-note">Incluindo o consórcio com lance e a alternativa de acumular investindo, para fechar o quadro completo de decisão.</p>
+
+  <div class="card" style="padding:0; overflow:hidden;">
+    <table>
+      <thead>
+        <tr><th>Caminho</th><th>Parcela</th><th>Custo total</th><th>Crédito liberado</th><th>Risco principal</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="font-family:'DM Sans',sans-serif; color:var(--text-primary);">CDC Safra</strong></td>
+          <td><strong>R$ 1.443,49</strong></td>
+          <td><strong style="color:var(--danger);">R$ 38.609</strong></td>
+          <td>Imediato</td>
+          <td>Custo de juros mais alto das cinco vias.</td>
+        </tr>
+        <tr style="background:rgba(76,175,140,0.04);">
+          <td><strong style="font-family:'DM Sans',sans-serif; color:var(--text-primary);">Consignado BB</strong></td>
+          <td><strong>R$ 1.425,05</strong></td>
+          <td><strong style="color:var(--success);">R$ 23.402</strong></td>
+          <td>Imediato</td>
+          <td>Compromete margem consignável por 48 meses.</td>
+        </tr>
+        <tr style="background:rgba(76,175,140,0.04);">
+          <td><strong style="font-family:'DM Sans',sans-serif; color:var(--text-primary);">Acumular / investir</strong></td>
+          <td>R$ 3.000/mês (aporte)</td>
+          <td><strong style="color:var(--success);">R$ 0 em juros ou taxas</strong></td>
+          <td>Gradual, sem data fixa</td>
+          <td>Não há crédito — depende só do ritmo de poupança.</td>
+        </tr>
+        <tr>
+          <td><strong style="font-family:'DM Sans',sans-serif; color:var(--text-primary);">Consórcio (sem lance)</strong></td>
+          <td><strong>R$ 1.313,53</strong></td>
+          <td><strong style="color:#8fa8e8;">R$ 18.708<span style="color:var(--text-muted); font-weight:400;"> (condicional)</span></strong></td>
+          <td>⚠ Via sorteio — sem data</td>
+          <td>Pode não contemplar a tempo de janeiro/2027; capital parado sem render até lá.</td>
+        </tr>
+        <tr>
+          <td><strong style="font-family:'DM Sans',sans-serif; color:var(--text-primary);">Consórcio + lance 20%</strong></td>
+          <td><strong>R$ 1.313,53</strong></td>
+          <td><strong style="color:#8fa8e8;">R$ 18.708<span style="color:var(--text-muted); font-weight:400;"> (condicional)</span> + R$21.741 imobilizados</strong></td>
+          <td>⚠ Melhora a chance — sem garantia</td>
+          <td>Imobiliza capital relevante sem certeza de prazo nem rendimento.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:20px;">
+    <div class="card">
+      <span class="tag tag-red">O que pesa contra o consórcio</span>
+      <ul class="checklist warn" style="margin-top:14px;">
+        <li>Não existe garantia de contemplação na data desejada.</li>
+        <li>Mesmo o lance não compra previsibilidade de prazo.</li>
+        <li>O dinheiro do lance fica preso em estrutura de baixa liquidez.</li>
+        <li>O custo de R$18.708 só se confirma se a contemplação ocorrer — até lá, não há carro nem rendimento sobre o capital empenhado.</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(76,175,140,0.25);">
+      <span class="tag tag-green">O que pesa a favor de acumular / consignado</span>
+      <ul class="checklist" style="margin-top:14px;">
+        <li>Acumular não tem taxa de administração, juros ou capital travado.</li>
+        <li>Consignado: parcela praticamente igual ao CDC Safra, com R$15.207 a menos em juros.</li>
+        <li>Ambos têm previsibilidade — sem depender de sorteio.</li>
+        <li>Consignado é compatível com uma data-alvo fixa, como janeiro/2027.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">09 · Como pensar a decisão</div>
+  <h2 class="section-title">A escolha certa depende da sua prioridade</h2>
+
+  <div class="card" style="padding:0; overflow:hidden;">
+    <table>
+      <thead><tr><th>Se a prioridade for...</th><th>Caminho mais coerente</th><th>Motivo</th></tr></thead>
+      <tbody>
+        <tr><td><strong style="font-family:'DM Sans',sans-serif; color:var(--text-primary);">Ter o carro em janeiro/2027</strong></td><td><span class="tag tag-blue">Consignado BB R$45 mil</span></td><td>Previsibilidade, parcela confortável e prazo menor.</td></tr>
+        <tr><td><strong style="font-family:'DM Sans',sans-serif; color:var(--text-primary);">Pagar o menor custo possível</strong></td><td><span class="tag tag-blue">Continuar acumulando</span></td><td>Aumenta a entrada e reduz a necessidade de crédito.</td></tr>
+        <tr><td><strong style="font-family:'DM Sans',sans-serif; color:var(--text-primary);">Comprar sem data definida</strong></td><td><span class="tag tag-blue">Acumular investindo</span></td><td>Mantém liquidez, evita taxa de administração.</td></tr>
+        <tr><td><strong style="font-family:'DM Sans',sans-serif; color:var(--text-primary);">Comprar imediatamente, sem entrada</strong></td><td><span class="tag tag-red">Evitar</span></td><td>Parcelas de R$2.003 a R$2.336 saem da zona de conforto.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="card" style="background:linear-gradient(135deg,var(--navy),#141a3d); border:0; padding:36px;">
+    <span class="tag tag-gold">Um ponto de partida</span>
+    <p class="quote" style="margin-top:16px;">Você não está numa emergência. Você está numa posição de escolha.</p>
+    <p style="color:var(--text-muted); margin-top:16px; font-size:0.95rem; max-width:760px;">
+      Por isso, vale olhar além de qual crédito foi aprovado ou qual parcela cabe hoje — e considerar
+      qual caminho permite trocar de carro mantendo a reserva, a capacidade de poupança, a liquidez
+      e os demais projetos do seu plano.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">10 · Os caminhos, lado a lado</div>
+  <h2 class="section-title">O que cada escolha entrega — e o que ela custa</h2>
+
+  <div class="grid grid-3">
+    <div class="card">
+      <span class="tag tag-blue">Se a prioridade é a data — jan/2027</span>
+      <h3 style="font-family:'Playfair Display',serif; font-weight:500; font-size:1.15rem; margin:14px 0 10px;">Consignado BB · R$ 45 mil</h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.65;">
+        Crédito liberado de forma imediata, parcela de R$1.425,05, dentro do limite de conforto
+        definido (R$1.500) e ainda sustentável no cenário conservador de renda futura (~15,2%).
+        Em troca, compromete a margem consignável por 48 meses.
+      </p>
+    </div>
+    <div class="card" style="border-color:rgba(76,175,140,0.25);">
+      <span class="tag tag-blue">Se a prioridade é custo total + liquidez</span>
+      <h3 style="font-family:'Playfair Display',serif; font-weight:500; font-size:1.15rem; margin:14px 0 10px;">Continuar acumulando / investindo</h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.65;">
+        Sem taxa de administração, sem juros e sem travar capital. Poupando ~R$3 mil/mês, cada mês
+        de espera aumenta a entrada disponível e reduz proporcionalmente o crédito necessário.
+        Em troca, adia a data de troca do veículo.
+      </p>
+    </div>
+    <div class="card" style="border-color:rgba(232,92,74,0.2);">
+      <span class="tag tag-red">Consórcio — por que não entra na comparação direta</span>
+      <h3 style="font-family:'Playfair Display',serif; font-weight:500; font-size:1.15rem; margin:14px 0 10px;">Custo nominal baixo, mas condicional</h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; line-height:1.65;">
+        O custo de R$18.708 só existe <em>se</em> e <em>quando</em> a contemplação acontecer — não há
+        sorteio garantido, nem prazo. Até lá, a parcela é paga sem ter o carro nem o dinheiro disponível.
+        Comparado a acumular investindo, perde em liquidez e não tem vantagem real de custo, já que o
+        capital fica parado sem render enquanto se aguarda a contemplação.
+      </p>
+    </div>
+  </div>
+
+  <div class="callout callout-danger" style="margin-top:18px;">
+    <strong>Por que o consórcio não compete de igual para igual:</strong> comparar a parcela do consórcio
+    com a do consignado ou com o ritmo de acumulação dá a falsa impressão de que são opções equivalentes.
+    Não são — o consórcio troca previsibilidade e liquidez por uma parcela nominalmente menor, e essa troca
+    só compensa se a contemplação vier rápido, o que não está sob controle. Acumular investindo entrega o
+    mesmo benefício de "custo baixo" sem essa incerteza: o dinheiro permanece líquido, sem taxa de administração,
+    e disponível a qualquer momento — inclusive para complementar o consignado e reduzir ainda mais o crédito necessário.
+  </div>
+
+  <div class="grid grid-2" style="margin-top:18px;">
+    <div class="card">
+      <span class="tag tag-gold">Resumo dos números</span>
+      <p style="margin-top:14px; color:var(--text-muted); font-size:0.92rem; line-height:1.7;">
+        Com a entrada disponível (carro avaliado + acumulado até dezembro/2026, estimado em ~R$58 mil),
+        o crédito necessário no consignado fica em torno de R$45 mil — opção que, na mesma faixa de
+        parcela do CDC Safra, custa R$15.207 a menos em juros totais.
+      </p>
+      <p style="margin-top:10px; color:var(--text-muted); font-size:0.92rem; line-height:1.7;">
+        No cenário conservador de renda (R$9.374,64 líquidos), essa parcela representaria ~15,2%
+        da renda. As parcelas acima de R$2.000 passam de 20% da renda nesse mesmo cenário.
+      </p>
+    </div>
+    <div class="card card-elevated" style="display:flex; align-items:center;">
+      <p class="quote">"Você não precisa comprar por impulso. Você tem condição de escolher o melhor momento."</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <div class="sig-name">Matheus Melo</div>
+    <div>Planejamento Financeiro Pessoal · Grão | Grupo Primo · CFP®</div>
+  </div>
+  <div style="text-align:right;">
+    Última atualização: Junho de 2026<br>
+    Material de apoio à decisão — não representa proposta vinculante de crédito.
+  </div>
+</footer>
+
+</div><!-- /shell -->
+</div><!-- /main-content -->
+
+<script>
+function checkPassword(){
+  const input = document.getElementById('pwd-input').value;
+  if(input === 'victoria2026'){
+    document.getElementById('password-overlay').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+    initCharts();
+  } else {
+    document.getElementById('pwd-error').style.display = 'block';
+  }
+}
+document.getElementById('pwd-input').addEventListener('keypress', function(e){
+  if(e.key === 'Enter') checkPassword();
+});
+
+function initCharts(){
+  const goldGrad = 'rgba(201,168,76,0.85)';
+  const navyGrad = 'rgba(99,130,210,0.85)';
+  const dangerGrad = 'rgba(232,92,74,0.85)';
+  const successGrad = 'rgba(76,175,140,0.85)';
+
+  Chart.defaults.color = '#8B8FA8';
+  Chart.defaults.font.family = "'DM Sans', sans-serif";
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+
+  // Gráfico 0: Acúmulo de entrada até janeiro/2027
+  new Chart(document.getElementById('chartAcumulo'), {
+    type: 'line',
+    data: {
+      labels: ['Jun/26','Jul/26','Ago/26','Set/26','Out/26','Nov/26','Dez/26'],
+      datasets: [{
+        label: 'Acumulado em dinheiro',
+        data: [3000, 6000, 9000, 12000, 15000, 22500, 33000],
+        borderColor: goldGrad,
+        backgroundColor: 'rgba(201,168,76,0.12)',
+        fill: true,
+        tension: 0.35,
+        pointBackgroundColor: goldGrad,
+        pointRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: (c) => 'R$ ' + c.parsed.y.toLocaleString('pt-BR') } } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: (v) => 'R$ '+(v/1000)+'k' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Gráfico 1: Parcela mensal
+  new Chart(document.getElementById('chartParcelas'), {
+    type: 'bar',
+    data: {
+      labels: ['CDC Safra', 'Consignado BB', 'Consórcio BB'],
+      datasets: [{
+        data: [1443.49, 1425.05, 1313.53],
+        backgroundColor: [dangerGrad, successGrad, navyGrad],
+        borderRadius: 8,
+        maxBarThickness: 70
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: (c) => 'R$ ' + c.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2}) } } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: (v) => 'R$ '+v } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Gráfico 2: Custo total
+  new Chart(document.getElementById('chartCustoTotal'), {
+    type: 'bar',
+    data: {
+      labels: ['CDC Safra', 'Consignado BB', 'Consórcio BB'],
+      datasets: [{
+        data: [38609.40, 23402.40, 18707.96],
+        backgroundColor: [dangerGrad, successGrad, navyGrad],
+        borderRadius: 8,
+        maxBarThickness: 70
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: (c) => 'R$ ' + c.parsed.y.toLocaleString('pt-BR',{minimumFractionDigits:2}) } } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: (v) => 'R$ '+(v/1000)+'k' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Gráfico 3: Teste de estresse (% da renda futura)
+  new Chart(document.getElementById('chartEstresse'), {
+    type: 'bar',
+    data: {
+      labels: ['Consórcio ~109k', 'Consignado 45k', 'Consignado 70k', 'Consignado 100k', 'Consignado 108k'],
+      datasets: [{
+        data: [14.0, 15.2, 15.0, 21.4, 24.9],
+        backgroundColor: [navyGrad, successGrad, successGrad, dangerGrad, dangerGrad],
+        borderRadius: 8,
+        maxBarThickness: 46
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: (c) => c.parsed.x + '% da renda líquida' } } },
+      scales: {
+        x: { beginAtZero: true, max: 30, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { callback: (v) => v+'%' } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+}
+</script>
+
+</body>
+</html>
